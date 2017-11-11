@@ -1,0 +1,9 @@
+source_set("browser") {
+  sources = []
+  deps = [
+    "//brave/components/brave_shields/browser:brave_shields",
+  ]
+  public_deps = [
+    "//chrome/common",
+  ]
+}
