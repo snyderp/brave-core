@@ -23,7 +23,7 @@ index cf36e40ee5426464cee670a11128a0e11ca49efd..58681c91fc82f889916ad080e8f23472
      "//components/sync",
    ]
 diff --git a/chrome/browser/browser_process.h b/chrome/browser/browser_process.h
-index 77cd9e948514e875e636da465f60136ebd510491..71227c22c4ec60ef23ea74d6e39ed0b7747d11fb 100644
+index 77cd9e948514e875e636da465f60136ebd510491..fd587778baca0a6885dd143f6ad390d28bb27af8 100644
 --- a/chrome/browser/browser_process.h
 +++ b/chrome/browser/browser_process.h
 @@ -47,6 +47,10 @@ namespace safe_browsing {
@@ -37,30 +37,33 @@ index 77cd9e948514e875e636da465f60136ebd510491..71227c22c4ec60ef23ea74d6e39ed0b7
  namespace subresource_filter {
  class ContentRulesetService;
  }
-@@ -271,6 +275,8 @@ class BrowserProcess {
+@@ -271,6 +275,10 @@ class BrowserProcess {
  
    virtual net_log::ChromeNetLog* net_log() = 0;
  
 +  virtual brave_shields::BaseBraveShieldsService* ad_block_service() = 0;
++  virtual brave_shields::BaseBraveShieldsService*
++    tracking_protection_service() = 0;
 +
    virtual component_updater::ComponentUpdateService* component_updater() = 0;
  
    virtual CRLSetFetcher* crl_set_fetcher() = 0;
 diff --git a/chrome/browser/browser_process_impl.cc b/chrome/browser/browser_process_impl.cc
-index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..9b6415a4f96abfabc0a8237226395dcd722d05eb 100644
+index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..4b3ac3eebf6609d1c7de666e679b9d3265fb998f 100644
 --- a/chrome/browser/browser_process_impl.cc
 +++ b/chrome/browser/browser_process_impl.cc
-@@ -34,7 +34,9 @@
+@@ -34,7 +34,10 @@
  #include "base/time/default_clock.h"
  #include "base/time/default_tick_clock.h"
  #include "base/trace_event/trace_event.h"
 +#include "brave/components/brave_shields/browser/brave_resource_dispatcher_host_delegate.h"
  #include "build/build_config.h"
 +#include "brave/components/brave_shields/browser/ad_block_service.h"
++#include "brave/components/brave_shields/browser/tracking_protection_service.h"
  #include "chrome/browser/chrome_browser_main.h"
  #include "chrome/browser/chrome_child_process_watcher.h"
  #include "chrome/browser/chrome_content_browser_client.h"
-@@ -954,6 +956,15 @@ net_log::ChromeNetLog* BrowserProcessImpl::net_log() {
+@@ -954,6 +957,25 @@ net_log::ChromeNetLog* BrowserProcessImpl::net_log() {
    return net_log_.get();
  }
  
@@ -73,10 +76,20 @@ index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..9b6415a4f96abfabc0a8237226395dcd
 +  return ad_block_service_.get();
 +}
 +
++brave_shields::BaseBraveShieldsService*
++BrowserProcessImpl::tracking_protection_service() {
++  if (tracking_protection_service_)
++    return tracking_protection_service_.get();
++
++  tracking_protection_service_ =
++    brave_shields::TrackingProtectionServiceFactory();
++  return tracking_protection_service_.get();
++}
++
  component_updater::ComponentUpdateService*
  BrowserProcessImpl::component_updater() {
    if (component_updater_)
-@@ -1004,7 +1015,7 @@ BrowserProcessImpl::supervised_user_whitelist_installer() {
+@@ -1004,7 +1026,7 @@ BrowserProcessImpl::supervised_user_whitelist_installer() {
  
  void BrowserProcessImpl::ResourceDispatcherHostCreated() {
    resource_dispatcher_host_delegate_ =
@@ -86,22 +99,26 @@ index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..9b6415a4f96abfabc0a8237226395dcd
        resource_dispatcher_host_delegate_.get());
  
 diff --git a/chrome/browser/browser_process_impl.h b/chrome/browser/browser_process_impl.h
-index 454080193dbbb41b6bea01416f28f210b26aaff0..5877f2f612ea0c214d9bce3655e6aa4cec0d5784 100644
+index 454080193dbbb41b6bea01416f28f210b26aaff0..c5a60fe4f2def6f8ecdbcf0900bf9c789180a711 100644
 --- a/chrome/browser/browser_process_impl.h
 +++ b/chrome/browser/browser_process_impl.h
-@@ -143,6 +143,7 @@ class BrowserProcessImpl : public BrowserProcess,
+@@ -143,6 +143,9 @@ class BrowserProcessImpl : public BrowserProcess,
  #endif
  
    net_log::ChromeNetLog* net_log() override;
 +  brave_shields::BaseBraveShieldsService* ad_block_service() override;
++  brave_shields::BaseBraveShieldsService*
++    tracking_protection_service() override;
    component_updater::ComponentUpdateService* component_updater() override;
    CRLSetFetcher* crl_set_fetcher() override;
    component_updater::PnaclComponentInstaller* pnacl_component_installer()
-@@ -310,6 +311,8 @@ class BrowserProcessImpl : public BrowserProcess,
+@@ -310,6 +313,10 @@ class BrowserProcessImpl : public BrowserProcess,
    void RestartBackgroundInstance();
  #endif  // defined(OS_WIN) || (defined(OS_LINUX) && !defined(OS_CHROMEOS))
  
 +  std::unique_ptr<brave_shields::BaseBraveShieldsService> ad_block_service_;
++  std::unique_ptr<brave_shields::BaseBraveShieldsService>
++    tracking_protection_service_;
 +
    // component updater is normally not used under ChromeOS due
    // to concerns over integrity of data shared between profiles,
