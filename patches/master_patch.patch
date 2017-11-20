@@ -123,6 +123,30 @@ index 454080193dbbb41b6bea01416f28f210b26aaff0..c5a60fe4f2def6f8ecdbcf0900bf9c78
    // component updater is normally not used under ChromeOS due
    // to concerns over integrity of data shared between profiles,
    // but some users of component updater only install per-user.
+diff --git a/chrome/browser/extensions/tab_helper.cc b/chrome/browser/extensions/tab_helper.cc
+index 21cbe22a4480f24c6793ef5c4d1db1d22329bafe..2004c29e50b32c2d934a2681593e7589d15c1fa8 100644
+--- a/chrome/browser/extensions/tab_helper.cc
++++ b/chrome/browser/extensions/tab_helper.cc
+@@ -47,6 +47,7 @@
+ #include "content/public/browser/web_contents.h"
+ #include "content/public/common/frame_navigate_params.h"
+ #include "extensions/browser/api/declarative/rules_registry_service.h"
++#include "extensions/browser/extension_api_frame_id_map.h"
+ #include "extensions/browser/extension_prefs.h"
+ #include "extensions/browser/extension_registry.h"
+ #include "extensions/browser/extension_system.h"
+@@ -286,6 +287,11 @@ void TabHelper::FinishCreateBookmarkApp(
+ 
+ void TabHelper::RenderFrameCreated(content::RenderFrameHost* host) {
+   SetTabId(host);
++
++  // Look up the extension API frame ID to force the mapping to be cached.
++  // This is needed so that cached information is available for tabId in the
++  // filtering callbacks.
++  ExtensionApiFrameIdMap::Get()->CacheFrameData(host);
+ }
+ 
+ void TabHelper::DidFinishNavigation(
 diff --git a/chrome/browser/plugins/plugin_finder.cc b/chrome/browser/plugins/plugin_finder.cc
 index 75c6ecab9a8d0d770141f7d3aaa6d18ddf249192..e8277e7b498ed475020aafaf8b84f1c3dd2bc779 100644
 --- a/chrome/browser/plugins/plugin_finder.cc
@@ -138,6 +162,43 @@ index 75c6ecab9a8d0d770141f7d3aaa6d18ddf249192..e8277e7b498ed475020aafaf8b84f1c3
        identifier_plugin_[identifier] = CreatePluginMetadata(identifier, plugin);
  
        if (installers_.find(identifier) == installers_.end())
+diff --git a/chrome/common/extensions/api/BUILD.gn b/chrome/common/extensions/api/BUILD.gn
+index ad3703177d68941b91d570bcfa001848ffa179a9..0a538c337f7c214b6934817c7e2d598132354d9c 100644
+--- a/chrome/common/extensions/api/BUILD.gn
++++ b/chrome/common/extensions/api/BUILD.gn
+@@ -83,6 +83,9 @@ schema_sources = [
+   "webstore_private.json",
+   "webstore_widget_private.idl",
+   "windows.json",
++
++  # Brave specific APIs
++  "//brave/common/extensions/api/brave_shields.json",
+ ]
+ if (!is_android) {
+   schema_sources += [ "processes.idl" ]
+@@ -194,6 +197,7 @@ json_schema_api("api") {
+   root_namespace = extensions_api_root_namespace
+   deps = [
+     "//extensions/common/api",
++    "//brave/common/extensions/api",
+   ]
+ }
+ 
+diff --git a/chrome/common/extensions/api/_api_features.json b/chrome/common/extensions/api/_api_features.json
+index 8ec1de091af1a17127e66bc67c6ee7cb8b5c2be3..0686739f34df6198129d2a9a363fba00da4a537e 100644
+--- a/chrome/common/extensions/api/_api_features.json
++++ b/chrome/common/extensions/api/_api_features.json
+@@ -826,5 +826,9 @@
+     "matches": [
+       "chrome://bookmarks/*"
+     ]
+-  }]
++  }],
++  "braveShields": {
++    "dependencies": ["permission:contentSettings"],
++    "contexts": ["blessed_extension"]
++  }
+ }
 diff --git a/chrome/common/extensions/api/content_settings.json b/chrome/common/extensions/api/content_settings.json
 index 9c0927abbb6127eae9f4e3143f6d508aa9d81f72..2e1df067e514b2c67c86866ed18a97b9eec02697 100644
 --- a/chrome/common/extensions/api/content_settings.json
@@ -223,6 +284,18 @@ index 6781f84119866016a4610cdfc187b25d82e442e9..196b3accc9cb5f328257fa50116bbf43
  };
  
  struct ContentSettingsTypeHash {
+diff --git a/extensions/browser/extension_event_histogram_value.h b/extensions/browser/extension_event_histogram_value.h
+index 6b388cec2f2f769ebfec1aced038713932fd8a2e..efbf382e109506570d41fdb25a98b5f04287cfc1 100644
+--- a/extensions/browser/extension_event_histogram_value.h
++++ b/extensions/browser/extension_event_histogram_value.h
+@@ -430,6 +430,7 @@ enum HistogramValue {
+   AUTOMATION_INTERNAL_ON_ACTION_RESULT,
+   // Last entry: Add new entries above, then run:
+   // python tools/metrics/histograms/update_extension_histograms.py
++  BRAVE_AD_BLOCKED = 2000,
+   ENUM_BOUNDARY
+ };
+ 
 diff --git a/third_party/widevine/cdm/BUILD.gn b/third_party/widevine/cdm/BUILD.gn
 index a3eac59cc2ebdb1f9d2bb7af8a7db0d44ab315a9..11d0c86fb7cdfc1881f563552fb6f5c5abdabae4 100644
 --- a/third_party/widevine/cdm/BUILD.gn
