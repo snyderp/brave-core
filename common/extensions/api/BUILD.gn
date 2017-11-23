@@ -1,12 +1,28 @@
-import("//extensions/common/api/schema.gni")
+import("//tools/json_schema_compiler/json_features.gni")
 import("//tools/json_schema_compiler/json_schema_api.gni")
 
-json_schema_api("api") {
-  root_namespace = extensions_api_root_namespace
-  schemas = true
-  bundle = true
-  bundle_name = ""
+json_features("api_features") {
+  feature_type = "APIFeature"
+  provider_class = "BraveAPIFeatureProvider"
+  sources = [
+    "_api_features.json",
+  ]
+}
+
+json_schema_api("generated_api") {
   sources = [
     "brave_shields.json"
+  ]
+  root_namespace = "extensions::api::%(namespace)s"
+  schemas = true
+  schema_include_rules = "extensions/common/api:extensions::api::%(namespace)s"
+  bundle = true
+  bundle_name = "Brave"
+}
+
+group("api") {
+  deps = [
+    ":generated_api",
+    ":api_features",
   ]
 }

@@ -179,21 +179,31 @@ index 77cd9e948514e875e636da465f60136ebd510491..fd587778baca0a6885dd143f6ad390d2
  
    virtual CRLSetFetcher* crl_set_fetcher() = 0;
 diff --git a/chrome/browser/browser_process_impl.cc b/chrome/browser/browser_process_impl.cc
-index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..070d45b3ac393d1b6f3f1f6dfd02d0712dfa1bab 100644
+index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..cb961a10f3bfa61bfc15344e3c635a835b16f121 100644
 --- a/chrome/browser/browser_process_impl.cc
 +++ b/chrome/browser/browser_process_impl.cc
-@@ -34,7 +34,10 @@
+@@ -34,7 +34,11 @@
  #include "base/time/default_clock.h"
  #include "base/time/default_tick_clock.h"
  #include "base/trace_event/trace_event.h"
 +#include "brave/components/brave_shields/browser/brave_resource_dispatcher_host_delegate.h"
++#include "brave/common/extensions/brave_extensions_client.h"
  #include "build/build_config.h"
 +#include "brave/components/brave_shields/browser/ad_block_service.h"
 +#include "brave/components/brave_shields/browser/tracking_protection_service.h"
  #include "chrome/browser/chrome_browser_main.h"
  #include "chrome/browser/chrome_child_process_watcher.h"
  #include "chrome/browser/chrome_content_browser_client.h"
-@@ -954,6 +957,25 @@ net_log::ChromeNetLog* BrowserProcessImpl::net_log() {
+@@ -264,7 +268,7 @@ BrowserProcessImpl::BrowserProcessImpl(
+       base::MakeRefCounted<extensions::EventRouterForwarder>();
+ 
+   extensions::ExtensionsClient::Set(
+-      extensions::ChromeExtensionsClient::GetInstance());
++      extensions::BraveExtensionsClient::GetInstance());
+ 
+   extensions_browser_client_ =
+       base::MakeUnique<extensions::ChromeExtensionsBrowserClient>();
+@@ -954,6 +958,25 @@ net_log::ChromeNetLog* BrowserProcessImpl::net_log() {
    return net_log_.get();
  }
  
@@ -219,7 +229,7 @@ index 675e9220b5fe7b71240ac28ab4e4fb97fae6fd96..070d45b3ac393d1b6f3f1f6dfd02d071
  component_updater::ComponentUpdateService*
  BrowserProcessImpl::component_updater() {
    if (component_updater_)
-@@ -1004,7 +1026,7 @@ BrowserProcessImpl::supervised_user_whitelist_installer() {
+@@ -1004,7 +1027,7 @@ BrowserProcessImpl::supervised_user_whitelist_installer() {
  
  void BrowserProcessImpl::ResourceDispatcherHostCreated() {
    resource_dispatcher_host_delegate_ =
@@ -334,42 +344,6 @@ index 99a3f816756039a628dc3032cbda3971dd415138..2cf32156411bd3a28e8c8096e25dcee5
  #else
  #error Unknown branding
  #endif
-diff --git a/chrome/common/extensions/api/BUILD.gn b/chrome/common/extensions/api/BUILD.gn
-index ad3703177d68941b91d570bcfa001848ffa179a9..a6eb9e854322f84a0d37c91218fd3bd93b412573 100644
---- a/chrome/common/extensions/api/BUILD.gn
-+++ b/chrome/common/extensions/api/BUILD.gn
-@@ -83,6 +83,8 @@ schema_sources = [
-   "webstore_private.json",
-   "webstore_widget_private.idl",
-   "windows.json",
-+
-+  "//brave/common/extensions/api/brave_shields.json",
- ]
- if (!is_android) {
-   schema_sources += [ "processes.idl" ]
-@@ -194,6 +196,7 @@ json_schema_api("api") {
-   root_namespace = extensions_api_root_namespace
-   deps = [
-     "//extensions/common/api",
-+    "//brave/common/extensions/api",
-   ]
- }
- 
-diff --git a/chrome/common/extensions/api/_api_features.json b/chrome/common/extensions/api/_api_features.json
-index 8ec1de091af1a17127e66bc67c6ee7cb8b5c2be3..0686739f34df6198129d2a9a363fba00da4a537e 100644
---- a/chrome/common/extensions/api/_api_features.json
-+++ b/chrome/common/extensions/api/_api_features.json
-@@ -826,5 +826,9 @@
-     "matches": [
-       "chrome://bookmarks/*"
-     ]
--  }]
-+  }],
-+  "braveShields": {
-+    "dependencies": ["permission:contentSettings"],
-+    "contexts": ["blessed_extension"]
-+  }
- }
 diff --git a/chrome/common/extensions/api/content_settings.json b/chrome/common/extensions/api/content_settings.json
 index 9c0927abbb6127eae9f4e3143f6d508aa9d81f72..2e1df067e514b2c67c86866ed18a97b9eec02697 100644
 --- a/chrome/common/extensions/api/content_settings.json

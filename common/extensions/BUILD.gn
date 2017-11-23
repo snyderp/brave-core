@@ -1,0 +1,9 @@
+source_set("extensions") {
+  sources = [
+    "brave_extensions_client.cc",
+    "brave_extensions_client.h",
+  ]
+  deps = [
+    "api"
+  ]
+}
