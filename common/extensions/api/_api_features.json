@@ -4,7 +4,8 @@
 
 {
   "braveShields": {
-    "dependencies": ["permission:contentSettings"],
+    "channel": "stable",
+    "dependencies": [],
     "contexts": ["blessed_extension"]
   }
 }

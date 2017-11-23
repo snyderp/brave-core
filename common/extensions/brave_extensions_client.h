@@ -18,6 +18,9 @@ class BraveExtensionsClient : public ChromeExtensionsClient {
   BraveExtensionsClient();
   ~BraveExtensionsClient() override;
 
+  std::unique_ptr<FeatureProvider> CreateFeatureProvider(
+    const std::string& name) const override;
+  std::unique_ptr<JSONFeatureProviderSource> CreateAPIFeatureSource() const override;
   bool IsAPISchemaGenerated(const std::string& name) const override;
   base::StringPiece GetAPISchema(const std::string& name) const override;
 

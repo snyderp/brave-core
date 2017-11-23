@@ -1,0 +1,31 @@
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+#
+# This file is used to assign starting resource ids for resources and strings
+# used by Chromium.  This is done to ensure that resource ids are unique
+# across all the grd files.  If you are adding a new grd file, please add
+# a new entry to this file.
+#
+# The entries below are organized into sections. When adding new entries,
+# please use the right section. Try to keep entries in alphabetical order.
+#
+# - chrome/app/
+# - chrome/browser/
+# - chrome/ miscellaneous
+# - components/
+# - content/
+# - ios/ (overlaps with chrome/ and content/)
+# - everything else
+#
+# The range of ID values, which is used by pak files, is from 0 to 2^16 - 1.
+{
+  # The first entry in the file, SRCDIR, is special: It is a relative path from
+  # this file to the base of your checkout.
+  "SRCDIR": "../../../../",
+
+  # Resource ids starting at 31000 are reserved for projects built on Chromium.
+  "brave/common/extensions/api/brave_api_resources.grd": {
+    "includes": [31001],
+  },
+}

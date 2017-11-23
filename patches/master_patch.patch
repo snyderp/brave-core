@@ -326,6 +326,26 @@ index 21cbe22a4480f24c6793ef5c4d1db1d22329bafe..2f57dc0636ab2947a401b9fc11896c83
  }
  
  void TabHelper::DidFinishNavigation(
+diff --git a/chrome/chrome_paks.gni b/chrome/chrome_paks.gni
+index c9a9a3d95f29f37e17c9c3b1fa6375f21eaf168a..60eace540225d60ddf2f7ddf20bb1e12dc7745c8 100644
+--- a/chrome/chrome_paks.gni
++++ b/chrome/chrome_paks.gni
+@@ -89,6 +89,7 @@ template("chrome_extra_paks") {
+     output = "${invoker.output_dir}/resources.pak"
+     sources = [
+       "$root_gen_dir/blink/public/resources/blink_resources.pak",
++      "$root_gen_dir/brave/common/extensions/api/brave_api_resources.pak",
+       "$root_gen_dir/chrome/browser_resources.pak",
+       "$root_gen_dir/chrome/chrome_unscaled_resources.pak",
+       "$root_gen_dir/chrome/common_resources.pak",
+@@ -116,6 +117,7 @@ template("chrome_extra_paks") {
+       "//chrome/common:resources",
+       "//components/resources",
+       "//content:resources",
++      "//brave/common/extensions/api:resources_grit",
+       "//content/browser/tracing:resources",
+       "//net:net_resources",
+       "//third_party/WebKit/public:resources",
 diff --git a/chrome/common/chrome_constants.cc b/chrome/common/chrome_constants.cc
 index 99a3f816756039a628dc3032cbda3971dd415138..2cf32156411bd3a28e8c8096e25dcee5afcf04ad 100644
 --- a/chrome/common/chrome_constants.cc
@@ -512,7 +532,7 @@ index a3eac59cc2ebdb1f9d2bb7af8a7db0d44ab315a9..11d0c86fb7cdfc1881f563552fb6f5c5
        #TODO(jrummell) Mac: 'DYLIB_INSTALL_NAME_BASE': '@loader_path',
      } else if (is_posix && !is_mac) {
 diff --git a/tools/gritsettings/resource_ids b/tools/gritsettings/resource_ids
-index ee0116d1852ba4d7ab0ab65f2ef8a70fc20636de..9fda56edc3b5934bc2f48a30ac1b733367ae724c 100644
+index ee0116d1852ba4d7ab0ab65f2ef8a70fc20636de..95ce5b63467872f48c0f6c27c686b53fe9dff316 100644
 --- a/tools/gritsettings/resource_ids
 +++ b/tools/gritsettings/resource_ids
 @@ -33,6 +33,9 @@
@@ -525,7 +545,15 @@ index ee0116d1852ba4d7ab0ab65f2ef8a70fc20636de..9fda56edc3b5934bc2f48a30ac1b7333
    "chrome/app/chromium_strings.grd": {
      "messages": [400],
    },
-@@ -140,6 +143,9 @@
+@@ -133,6 +136,7 @@
+   "chrome/test/data/webui_test_resources.grd": {
+     "includes": [12850],
+   },
++
+   # END chrome/ miscellaneous section.
+ 
+   # START components/ section.
+@@ -140,6 +144,9 @@
    # Chromium strings and Google Chrome strings must start at the same id.
    # We only use one file depending on whether we're building Chromium or
    # Google Chrome.
@@ -535,3 +563,11 @@ index ee0116d1852ba4d7ab0ab65f2ef8a70fc20636de..9fda56edc3b5934bc2f48a30ac1b7333
    "components/components_chromium_strings.grd": {
      "messages": [15000],
    },
+@@ -380,4 +387,7 @@
+   # Please read the header and find the right section above instead.
+ 
+   # Resource ids starting at 31000 are reserved for projects built on Chromium.
++  "brave/common/extensions/api/brave_api_resources.grd": {
++    "includes": [31001],
++  },
+ }
