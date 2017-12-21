@@ -1,16 +1,38 @@
 diff --git a/build/config/chrome_build.gni b/build/config/chrome_build.gni
-index c649018a7a0aeb20caeb2bf37c60d57c48630f1b..9a320d8b5f46f2c7f2d269b7a1cc3b2cf91c07a7 100644
+index c649018a7a0aeb20caeb2bf37c60d57c48630f1b..fdaec4cc56b50d32682ef0036864bb13f7858382 100644
 --- a/build/config/chrome_build.gni
 +++ b/build/config/chrome_build.gni
-@@ -18,5 +18,5 @@ declare_args() {
+@@ -11,6 +11,8 @@ declare_args() {
+   # Break chrome.dll into multple pieces based on process type. Only available
+   # on Windows.
+   is_multi_dll_chrome = is_win && !is_component_build
++
++  brave_channel = ""
+ }
+ 
+ # Refers to the subdirectory for branding in various places including
+@@ -18,5 +20,5 @@ declare_args() {
  if (is_chrome_branded) {
    branding_path_component = "google_chrome"
  } else {
 -  branding_path_component = "chromium"
 +  branding_path_component = "brave"
  }
+diff --git a/build/mac/tweak_info_plist.gni b/build/mac/tweak_info_plist.gni
+index 505f5e50ab75942e6504bb5fe377b17da51be9c9..df37d4bedf38a0ecab9505b6ef5d9693cb5e6a0d 100644
+--- a/build/mac/tweak_info_plist.gni
++++ b/build/mac/tweak_info_plist.gni
+@@ -55,7 +55,7 @@ template("tweak_info_plist") {
+                              "args",
+                              "testonly",
+                            ])
+-    script = "//build/mac/tweak_info_plist.py"
++    script = "//brave/build/mac/tweak_info_plist.py"
+     inputs = [
+       script,
+       "//build/util/version.py",
 diff --git a/chrome/BUILD.gn b/chrome/BUILD.gn
-index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b83354a53ddc 100644
+index 5d0274b0424ecfd527962c5116370a7593d10d15..dae81bf85e77d65c9bf699d82825139153c78dc3 100644
 --- a/chrome/BUILD.gn
 +++ b/chrome/BUILD.gn
 @@ -238,6 +238,8 @@ if (!is_android && !is_mac) {
@@ -51,7 +73,15 @@ index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b833
  
    group("chrome") {
      deps = [
-@@ -649,7 +657,7 @@ if (is_win) {
+@@ -582,6 +590,7 @@ if (is_win) {
+       "--keystone=$_keystone_arg",
+       "--scm=1",
+       "--bundle_id=$chrome_mac_bundle_id",
++      "--channel=" + brave_channel,
+     ]
+   }
+ 
+@@ -649,7 +658,7 @@ if (is_win) {
      args =
          [
            "-b",
@@ -60,7 +90,7 @@ index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b833
            "-v",
            rebase_path(chrome_version_file, root_build_dir),
            "-g",
-@@ -1150,6 +1158,8 @@ if (is_win) {
+@@ -1150,6 +1159,8 @@ if (is_win) {
        "app/chrome_main.cc",
        "app/chrome_main_delegate.cc",
        "app/chrome_main_delegate.h",
@@ -69,7 +99,7 @@ index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b833
        "app/chrome_main_mac.h",
        "app/chrome_main_mac.mm",
      ]
-@@ -1389,6 +1399,7 @@ if (is_win) {
+@@ -1389,6 +1400,7 @@ if (is_win) {
  
  group("browser_dependencies") {
    public_deps = [
@@ -77,7 +107,7 @@ index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b833
      "//chrome/browser",
      "//chrome/common",
      "//components/sync",
-@@ -1426,6 +1437,7 @@ group("browser_dependencies") {
+@@ -1426,6 +1438,7 @@ group("browser_dependencies") {
  
  group("child_dependencies") {
    public_deps = [
@@ -85,7 +115,7 @@ index 5d0274b0424ecfd527962c5116370a7593d10d15..1328c557c15354b0505e294b6142b833
      "//chrome/browser/devtools",
      "//chrome/child",
      "//chrome/common",
-@@ -1715,6 +1727,8 @@ if (is_android) {
+@@ -1715,6 +1728,8 @@ if (is_android) {
        "app/android/chrome_main_delegate_android.h",
        "app/chrome_main_delegate.cc",
        "app/chrome_main_delegate.h",
@@ -282,6 +312,81 @@ index ff3b6d2d23c6d785da2358bfac6723e1fce971a1..3eb0a4e6e813e65dd33fd4bfb750c395
    chrome_browser_net::NetErrorTabHelper::CreateForWebContents(web_contents);
    chrome_browser_net::PredictorTabHelper::CreateForWebContents(web_contents);
    if (base::FeatureList::IsEnabled(kDecoupleTranslateLanguageFeature)) {
+diff --git a/chrome/common/BUILD.gn b/chrome/common/BUILD.gn
+index 476a165dd2b1f4d724c3b2a5d8fd30b994d1dd05..a678027d06cd826da03ed04e1e78aa041981f48b 100644
+--- a/chrome/common/BUILD.gn
++++ b/chrome/common/BUILD.gn
+@@ -59,6 +59,7 @@ source_set("channel_info") {
+     "channel_info_chromeos.cc",
+     "channel_info_mac.mm",
+     "channel_info_win.cc",
++    "//brave/common/brave_channel_info_mac.mm",
+   ]
+ 
+   if (!is_android && !is_chromeos && !is_mac) {
+diff --git a/chrome/common/channel_info.h b/chrome/common/channel_info.h
+index 010de41e70dd27e6ba8e4246bf52f911c7958c3d..987967553751db157763a28d43f47e4db05b9a8c 100644
+--- a/chrome/common/channel_info.h
++++ b/chrome/common/channel_info.h
+@@ -41,7 +41,7 @@ version_info::Channel GetChannel();
+ void SetChannel(const std::string& channel);
+ #endif
+ 
+-#if defined(OS_POSIX) && defined(GOOGLE_CHROME_BUILD)
++#if defined(OS_POSIX) || defined(OS_MACOSX)
+ // Returns a channel-specific suffix to use when constructing the path of the
+ // default user data directory, allowing multiple channels to run side-by-side.
+ // In the stable channel, this returns the empty string.
+diff --git a/chrome/common/channel_info_mac.mm b/chrome/common/channel_info_mac.mm
+index d2cb34d4a6ae9e78f4a85f2b69770107d288ec87..c53519760e235ee1b3d3ad18ef0b9ca12e0f5a68 100644
+--- a/chrome/common/channel_info_mac.mm
++++ b/chrome/common/channel_info_mac.mm
+@@ -13,7 +13,6 @@
+ namespace chrome {
+ 
+ std::string GetChannelString() {
+-#if defined(GOOGLE_CHROME_BUILD)
+   // Use the main Chrome application bundle and not the framework bundle.
+   // Keystone keys don't live in the framework.
+   NSBundle* bundle = base::mac::OuterBundle();
+@@ -21,10 +20,11 @@ std::string GetChannelString() {
+ 
+   // Only ever return "", "unknown", "beta", "dev", or "canary" in a branded
+   // build.
+-  if (![bundle objectForInfoDictionaryKey:@"KSProductID"]) {
+-    // This build is not Keystone-enabled, it can't have a channel.
+-    channel = @"unknown";
+-  } else if (!channel) {
++  // if (![bundle objectForInfoDictionaryKey:@"KSProductID"]) {
++  //   // This build is not Keystone-enabled, it can't have a channel.
++  //   channel = @"unknown";
++  // } else if (!channel) {
++  if (!channel) {
+     // For the stable channel, KSChannelID is not set.
+     channel = @"";
+   } else if ([channel isEqual:@"beta"] ||
+@@ -36,13 +36,9 @@ std::string GetChannelString() {
+   }
+ 
+   return base::SysNSStringToUTF8(channel);
+-#else
+-  return std::string();
+-#endif
+ }
+ 
+ version_info::Channel GetChannel() {
+-#if defined(GOOGLE_CHROME_BUILD)
+   std::string channel = GetChannelString();
+   if (channel.empty()) {
+     return version_info::Channel::STABLE;
+@@ -53,7 +49,6 @@ version_info::Channel GetChannel() {
+   } else if (channel == "canary") {
+     return version_info::Channel::CANARY;
+   }
+-#endif
+ 
+   return version_info::Channel::UNKNOWN;
+ }
 diff --git a/chrome/common/chrome_constants.cc b/chrome/common/chrome_constants.cc
 index d4e0823a55994118bacfe4fd7f8ec1881640e8ac..84788c9cc020c756c45e96fab8ab2119df1b18f8 100644
 --- a/chrome/common/chrome_constants.cc
@@ -317,18 +422,30 @@ index fc47bd3f12418fdaed879e0b485bfc7cb572a6e8..9f02b6d08385a175354831a8037cb7be
    return true;
  }
 diff --git a/chrome/common/chrome_paths_mac.mm b/chrome/common/chrome_paths_mac.mm
-index cca3bbb41ae25484c3e87c9aba09a8b07741e2b2..f231ca44af970aed896f3c62e0a39fc6e61d0b72 100644
+index cca3bbb41ae25484c3e87c9aba09a8b07741e2b2..152f04b6bed75470f22872969c54ac5fd09dc161 100644
 --- a/chrome/common/chrome_paths_mac.mm
 +++ b/chrome/common/chrome_paths_mac.mm
-@@ -58,8 +58,10 @@ char* ProductDirNameForBundle(NSBundle* chrome_bundle) {
+@@ -15,6 +15,7 @@
+ #include "base/memory/free_deleter.h"
+ #include "base/path_service.h"
+ #include "build/build_config.h"
++#include "chrome/common/channel_info.h"
+ #include "chrome/common/chrome_constants.h"
+ #include "chrome/common/chrome_paths_internal.h"
+ 
+@@ -58,8 +59,14 @@ char* ProductDirNameForBundle(NSBundle* chrome_bundle) {
    if (!product_dir_name) {
  #if defined(GOOGLE_CHROME_BUILD)
      product_dir_name = "Google/Chrome";
 +#elif defined(OFFICIAL_BUILD)
-+    product_dir_name = "Brave";
++    std::string name = "Brave" +
++      chrome::GetChannelSuffixForDataDir();
++    product_dir_name = name.c_str();
  #else
 -    product_dir_name = "Chromium";
-+    product_dir_name = "Brave-Development";
++    std::string name = "Brave-Development" +
++      chrome::GetChannelSuffixForDataDir();
++    product_dir_name = name.c_str();
  #endif
    }
  
