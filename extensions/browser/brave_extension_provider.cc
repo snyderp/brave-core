@@ -20,6 +20,8 @@ bool IsWhitelisted(const std::string& id) {
   static std::vector<std::string> whitelist({
     // Brave
     brave_extension_id,
+    // PDF.js
+    "oemmndcbldboiebfnladdacbdfmadadm",
     // CryptoTokenExtension
     "kmendfapggjehodndflmmgagdbamhnfd",
     // Cloud Print
