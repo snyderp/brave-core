@@ -13,7 +13,6 @@
 #include <mutex>
 
 #include "base/files/file_path.h"
-#include "base/sequenced_task_runner.h"
 #include "components/component_updater/component_updater_service.h"
 #include "content/public/common/resource_type.h"
 #include "url/gurl.h"
@@ -44,9 +43,6 @@ class BaseBraveShieldsService : public ComponentsUI {
   virtual bool ShouldStartRequest(const GURL& url,
       content::ResourceType resource_type,
       const std::string& tab_host);
-  scoped_refptr<base::SequencedTaskRunner> GetTaskRunner() {
-    return task_runner_;
-  }
 
  protected:
   virtual bool Init() = 0;
@@ -60,7 +56,6 @@ class BaseBraveShieldsService : public ComponentsUI {
 
   bool initialized_;
   std::mutex initialized_mutex_;
-  scoped_refptr<base::SequencedTaskRunner> task_runner_;
   std::string component_name_;
   std::string component_id_;
   std::string component_base64_public_key_;

@@ -45,7 +45,6 @@ public:
 
   void PreRunTestOnMainThread() override {
     ExtensionBrowserTest::PreRunTestOnMainThread();
-    WaitForHTTPSEverywhereServiceThread();
     ASSERT_TRUE(
       g_brave_browser_process->https_everywhere_service()->IsInitialized());
   }
@@ -78,13 +77,6 @@ public:
         httpse_extension->id(), httpse_extension->path());
 
     return true;
-  }
-
-  void WaitForHTTPSEverywhereServiceThread() {
-    scoped_refptr<base::ThreadTestHelper> io_helper(
-        new base::ThreadTestHelper(
-            g_brave_browser_process->https_everywhere_service()->GetTaskRunner()));
-    ASSERT_TRUE(io_helper->Run());
   }
 };
 

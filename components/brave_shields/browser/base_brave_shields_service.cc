@@ -17,7 +17,6 @@
 #include "base/macros.h"
 #include "base/memory/ptr_util.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/task_runner_util.h"
 #include "base/task_scheduler/post_task.h"
 #include "base/threading/thread_restrictions.h"
 #include "brave/browser/brave_browser_process_impl.h"
@@ -37,8 +36,6 @@ BaseBraveShieldsService::BaseBraveShieldsService(
     const std::string& component_id,
     const std::string& component_base64_public_key)
     : initialized_(false),
-      task_runner_(
-          base::CreateSequencedTaskRunnerWithTraits({base::MayBlock()})),
       component_name_(component_name),
       component_id_(component_id),
       component_base64_public_key_(component_base64_public_key) {

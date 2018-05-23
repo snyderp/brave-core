@@ -56,7 +56,6 @@ public:
 
   void PreRunTestOnMainThread() override {
     ExtensionBrowserTest::PreRunTestOnMainThread();
-    WaitForTrackingProtectionServiceThread();
     ASSERT_TRUE(g_brave_browser_process->tracking_protection_service()->IsInitialized());
   }
 
@@ -88,13 +87,6 @@ public:
         tracking_protection_extension->id(), tracking_protection_extension->path());
 
     return true;
-  }
-
-  void WaitForTrackingProtectionServiceThread() {
-    scoped_refptr<base::ThreadTestHelper> io_helper(
-        new base::ThreadTestHelper(
-            g_brave_browser_process->tracking_protection_service()->GetTaskRunner()));
-    ASSERT_TRUE(io_helper->Run());
   }
 };
 
