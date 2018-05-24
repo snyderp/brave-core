@@ -1,0 +1,16 @@
+diff --git a/third_party/WebKit/Source/modules/battery/NavigatorBattery.cpp b/third_party/WebKit/Source/modules/battery/NavigatorBattery.cpp
+index 2083421bbe21327f8c1252437387bbe9926abc56..ab702ca8ce9f36d0aa1daad09b6b6dc6ee2fe5d0 100644
+--- a/third_party/WebKit/Source/modules/battery/NavigatorBattery.cpp
++++ b/third_party/WebKit/Source/modules/battery/NavigatorBattery.cpp
+@@ -16,7 +16,11 @@ NavigatorBattery::NavigatorBattery(Navigator& navigator)
+ 
+ ScriptPromise NavigatorBattery::getBattery(ScriptState* script_state,
+                                            Navigator& navigator) {
++#if defined(MUON_CHROMIUM_BUILD)
+   return NavigatorBattery::From(navigator).getBattery(script_state);
++#else 
++  return ScriptPromise{};
++#endif
+ }
+ 
+ ScriptPromise NavigatorBattery::getBattery(ScriptState* script_state) {

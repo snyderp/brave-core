@@ -1,0 +1,16 @@
+diff --git a/third_party/WebKit/Source/modules/webusb/NavigatorUSB.cpp b/third_party/WebKit/Source/modules/webusb/NavigatorUSB.cpp
+index 70f002ef02b53c8dde84e0f1581b48d17276e736..99ecdc4789113a3f944f01a7fc3f96750eda58f7 100644
+--- a/third_party/WebKit/Source/modules/webusb/NavigatorUSB.cpp
++++ b/third_party/WebKit/Source/modules/webusb/NavigatorUSB.cpp
+@@ -20,7 +20,11 @@ NavigatorUSB& NavigatorUSB::From(Navigator& navigator) {
+ }
+ 
+ USB* NavigatorUSB::usb(Navigator& navigator) {
++#if defined(MUON_CHROMIUM_BUILD)
+   return NavigatorUSB::From(navigator).usb();
++#else
++  return nullptr;
++#endif
+ }
+ 
+ USB* NavigatorUSB::usb() {
