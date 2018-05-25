@@ -27,6 +27,7 @@ class BraveMainDelegate : public ChromeMainDelegate {
   content::ContentUtilityClient* CreateContentUtilityClient() override;
   void PreSandboxStartup() override;
 
+  void DisableAPIs();
   DISALLOW_COPY_AND_ASSIGN(BraveMainDelegate);
 };
 

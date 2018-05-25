@@ -72,11 +72,14 @@ bool BraveMainDelegate::ShouldEnableProfilerRecording() {
   return false;
 }
 
-void BraveMainDelegate::PreSandboxStartup() {
-  ChromeMainDelegate::PreSandboxStartup();
-
+void BraveMainDelegate::DisableAPIs() {
   blink::WebRuntimeFeatures::EnableWebUsb(false);
   blink::WebRuntimeFeatures::EnableWebBluetooth(false);
+  blink::WebRuntimeFeatures::EnableSharedArrayBuffer(false);
+}
+
+void BraveMainDelegate::PreSandboxStartup() {
+  ChromeMainDelegate::PreSandboxStartup();
 
 #if defined(OS_POSIX)
   // Setup NativeMessagingHosts to point to the default Chrome locations
