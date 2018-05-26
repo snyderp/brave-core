@@ -21,13 +21,7 @@
 #include "base/threading/thread_restrictions.h"
 #include "brave/browser/brave_browser_process_impl.h"
 #include "brave/browser/component_updater/brave_component_installer.h"
-
-void ComponentsUI::OnDemandUpdate(
-    component_updater::ComponentUpdateService* cus,
-    const std::string& component_id) {
-  cus->GetOnDemandUpdater().OnDemandUpdate(component_id,
-      component_updater::Callback());
-}
+#include "brave/browser/extensions/brave_component_loader_api.h"
 
 namespace brave_shields {
 
@@ -39,18 +33,17 @@ BaseBraveShieldsService::BaseBraveShieldsService(
       component_name_(component_name),
       component_id_(component_id),
       component_base64_public_key_(component_base64_public_key) {
-  base::Closure registered_callback =
-      base::Bind(&BaseBraveShieldsService::OnComponentRegistered,
-                 base::Unretained(this), component_id_);
-  ReadyCallback ready_callback =
-      base::Bind(&BaseBraveShieldsService::OnComponentReady,
-                 base::Unretained(this), component_id_);
-  brave::RegisterComponent(g_browser_process->component_updater(),
+    extensions::BraveComponentLoaderAPI::RegisterExtension(component_id_,
       component_name_, component_base64_public_key_,
-      registered_callback, ready_callback);
+      base::Bind(&BaseBraveShieldsService::OnComponentReady,
+          base::Unretained(this), component_id));
 }
 
 BaseBraveShieldsService::~BaseBraveShieldsService() {
+}
+
+void BaseBraveShieldsService::OnComponentReady(const std::string& component_id,
+    const base::FilePath& install_dir) {
 }
 
 bool BaseBraveShieldsService::IsInitialized() const {
@@ -85,13 +78,5 @@ bool BaseBraveShieldsService::ShouldStartRequest(const GURL& url,
   return true;
 }
 
-void BaseBraveShieldsService::OnComponentRegistered(const std::string& component_id) {
-  OnDemandUpdate(g_browser_process->component_updater(), component_id);
-}
-
-void BaseBraveShieldsService::OnComponentReady(
-    const std::string& component_id,
-    const base::FilePath& install_dir) {
-}
 
 }  // namespace brave_shields

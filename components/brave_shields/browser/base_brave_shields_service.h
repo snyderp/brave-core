@@ -13,25 +13,14 @@
 #include <mutex>
 
 #include "base/files/file_path.h"
-#include "components/component_updater/component_updater_service.h"
 #include "content/public/common/resource_type.h"
 #include "url/gurl.h"
-
-// Just used to give access to OnDemandUpdater since it's private.
-// Chromium has ComponentsUI which is a friend class, so we just
-// do this hack here to gain access.
-class ComponentsUI {
- public:
-  void OnDemandUpdate(
-      component_updater::ComponentUpdateService* cus,
-      const std::string& component_id);
-};
 
 namespace brave_shields {
 
 // The brave shields service in charge of checking brave shields like ad-block,
 // tracking protection, etc.
-class BaseBraveShieldsService : public ComponentsUI {
+class BaseBraveShieldsService {
  public:
   BaseBraveShieldsService(const std::string& component_name,
                           const std::string& component_id,
@@ -43,13 +32,12 @@ class BaseBraveShieldsService : public ComponentsUI {
   virtual bool ShouldStartRequest(const GURL& url,
       content::ResourceType resource_type,
       const std::string& tab_host);
+  virtual void OnComponentReady(const std::string& component_id,
+      const base::FilePath& install_dir);
 
  protected:
   virtual bool Init() = 0;
   virtual void Cleanup() = 0;
-  virtual void OnComponentRegistered(const std::string& component_id);
-  virtual void OnComponentReady(const std::string& component_id,
-                                const base::FilePath& install_dir);
 
  private:
   void InitShields();
