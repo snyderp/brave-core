@@ -27,7 +27,7 @@ bool IsWhitelisted(const std::string& id) {
     // Cloud Print
     "mfehgcgbbipciphmccgaenjidiccnmng",
     // Chromium PDF Viewer
-    "mhjfbmdgcfjbbpaeojofohoefgiehjai",
+    //"mhjfbmdgcfjbbpaeojofohoefgiehjai",
     // Web Store
     "ahfgeienlihckogmohjhadlkjgocpleb",
     // Grammarly for Chrome

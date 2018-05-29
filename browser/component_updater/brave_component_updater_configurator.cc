@@ -180,7 +180,7 @@ update_client::ActivityDataService* BraveConfigurator::GetActivityDataService()
 }
 
 bool BraveConfigurator::IsPerUserInstall() const {
-  return false;
+  return true;//false;
 }
 
 std::vector<uint8_t> BraveConfigurator::GetRunActionKeyHash() const {
