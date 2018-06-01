@@ -1,0 +1,12 @@
+diff --git a/chrome/app/md_extensions_strings.grdp b/chrome/app/md_extensions_strings.grdp
+index 357032a2b01ab61eda48d55fe6dd78a87a4b16f1..02191e8bb65952dd68958ef2f04d95d8217a70d6 100644
+--- a/chrome/app/md_extensions_strings.grdp
++++ b/chrome/app/md_extensions_strings.grdp
+@@ -157,7 +157,6 @@
+     Retry
+   </message>
+   <message name="IDS_MD_EXTENSIONS_NO_INSTALLED_ITEMS" desc="The message shown to the user on the Extensions settings page when there are no extensions or apps installed.">
+-    Find extensions and themes in the <ph name="BEGIN_LINK">&lt;a target="_blank" href="https://chrome.google.com/webstore/category/extensions"&gt;</ph>Chrome Web Store<ph name="END_LINK">&lt;/a&gt;<ex>&lt;/a&gt;</ex></ph>
+   </message>
+   <message name="IDS_MD_EXTENSIONS_NO_DESCRIPTION" desc="The message shown to the user when an extension does not have any description.">
+     No description provided
