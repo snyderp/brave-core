@@ -79,6 +79,7 @@ void BraveMainDelegate::DisableAPIs() {
 }
 
 void BraveMainDelegate::PreSandboxStartup() {
+  DisableAPIs();
   ChromeMainDelegate::PreSandboxStartup();
 
 #if defined(OS_POSIX)
