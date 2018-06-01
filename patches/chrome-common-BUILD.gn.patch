@@ -1,7 +1,16 @@
 diff --git a/chrome/common/BUILD.gn b/chrome/common/BUILD.gn
-index 7ca361112ae6553b5d55c0118868b6592466e466..936af314f3c6754940ca44cffb6b11bbab3cf453 100644
+index 7ca361112ae6553b5d55c0118868b6592466e466..0319cfee636d9f560166946e8b0c9cb8b7186418 100644
 --- a/chrome/common/BUILD.gn
 +++ b/chrome/common/BUILD.gn
+@@ -187,7 +187,7 @@ static_library("common") {
+     "tts_messages.h",
+     "tts_utterance_request.cc",
+     "tts_utterance_request.h",
+-    "url_constants.cc",
++    "//brave/common/url_constants.cc",
+     "url_constants.h",
+     "web_application_info.cc",
+     "web_application_info.h",
 @@ -533,6 +533,13 @@ static_library("non_code_constants") {
      "env_vars.h",
    ]
