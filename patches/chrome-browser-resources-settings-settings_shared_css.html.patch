@@ -1,0 +1,23 @@
+diff --git a/chrome/browser/resources/settings/settings_shared_css.html b/chrome/browser/resources/settings/settings_shared_css.html
+index 2c89c7a5a3616092cd3718e2c164a1fae7578062..0011481a02fd76628eeb06d62a29790a8df7b498 100644
+--- a/chrome/browser/resources/settings/settings_shared_css.html
++++ b/chrome/browser/resources/settings/settings_shared_css.html
+@@ -15,6 +15,18 @@
+     <style include="settings-icons paper-button-style paper-checkbox-style paper-input-style paper-toggle-style cr-shared-style search-highlight-style">
+       /* Prevent action-links from being selected to avoid accidental
+        * selection when trying to click it. */
++
++      #people,
++      #themeRow,
++      #cloudPrinters,
++      a[href='/accessibility'],
++      settings-section[page-title='People'],
++      settings-section[page-title='Accessibility'],
++      div#advancedButton {
++        display: none !important;
++        visibility: hidden !important;
++      }
++
+       a[is=action-link] {
+         user-select: none;
+       }

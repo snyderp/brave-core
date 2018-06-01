@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/resources/settings/basic_page/basic_page.html b/chrome/browser/resources/settings/basic_page/basic_page.html
+index 80ab0b65c36d2a8ce9a44f66fe20da16b1cc8636..421b50ec48c0e9e619dfd7b21ddf23f47fce3b90 100644
+--- a/chrome/browser/resources/settings/basic_page/basic_page.html
++++ b/chrome/browser/resources/settings/basic_page/basic_page.html
+@@ -13,6 +13,7 @@
+ <link rel="import" href="../settings_page/settings_section.html">
+ <link rel="import" href="../settings_page_css.html">
+ <link rel="import" href="../settings_vars_css.html">
++<link rel="import" href="../settings_shared_css.html">
+ 
+ <if expr="chromeos">
+ <link rel="import" href="../android_apps_page/android_apps_browser_proxy.html">
+@@ -35,6 +36,7 @@
+      includes both the basic and advanced settings. -->
+ <dom-module id="settings-basic-page">
+   <template>
++    <style include="settings-shared"></style>
+     <style include="settings-page-styles cr-hidden-style">
+       :host([is-subpage-animating]) {
+         /* Prevent an unwanted horizontal scrollbar when transitioning back from
