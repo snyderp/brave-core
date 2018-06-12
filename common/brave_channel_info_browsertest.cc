@@ -10,6 +10,10 @@ using BraveChannelInfoBrowserTest = InProcessBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(BraveChannelInfoBrowserTest, DefaultChannelTest) {
 #if defined(OFFICIAL_BUILD)
+#if defined(OS_LINUX)
+  // To test, this env var is needed.
+  setenv("CHROME_VERSION_EXTRA", "stable");
+#endif
   EXPECT_NE(version_info::Channel::UNKNOWN, chrome::GetChannel());
 #else
   EXPECT_EQ(version_info::Channel::UNKNOWN, chrome::GetChannel());
